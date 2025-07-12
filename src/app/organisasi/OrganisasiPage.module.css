@@ -1,65 +1,183 @@
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
   font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #34495e;
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-form {
+.buttonToggle,
+.linkButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.buttonToggle:hover,
+.linkButton:hover {
+  background-color: #005bb5;
+}
+
+.formWrapper {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  max-width: 600px;
+  background-color: white;
+}
+
+.formWrapper h1,
+.formWrapper h3 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.formGroup {
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  background: #ffffff;
-  padding: 24px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
 }
 
-label {
+.formGroup span {
+  margin-bottom: 6px;
   font-weight: 500;
-  margin-bottom: 4px;
+  color: #333;
 }
 
-input, select {
+.formGroup input,
+.formGroup select {
   padding: 10px;
-  border: 1px solid #bbb;
-  border-radius: 5px;
-  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
-button {
-  background-color: #2ecc71;
+.submitButton {
+  background-color: #0070f3;
   color: white;
-  padding: 12px;
-  font-weight: bold;
+  padding: 10px 15px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 500;
 }
 
-button:hover {
-  background-color: #27ae60;
+.submitButton:hover {
+  background-color: #005bb5;
 }
 
-table {
+.editButton {
+  background-color: #0070f3;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+.editButton:hover {
+  background-color: #005bb5;
+}
+
+.deleteButton {
+  background-color: #dc3545;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+}
+
+.tableWrapper {
+  margin-top: 30px;
+  overflow-x: auto;
+}
+
+.tableWrapper table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 32px;
+  font-size: 0.95rem;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 10px;
+.tableWrapper th,
+.tableWrapper td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
   text-align: left;
 }
 
-th {
-  background-color: #ecf0f1;
+.tableWrapper th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.tableWrapper tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tableWrapper tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s ease;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s ease;
 }

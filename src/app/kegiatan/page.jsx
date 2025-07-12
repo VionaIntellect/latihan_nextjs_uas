@@ -1,207 +1,223 @@
 "use client";
+import styles from './KegiatanPage.module.css';
+import {useState, useEffect} from 'react';
 
-import { useEffect, useState } from "react";
-import styles from "./KegiatanPage.module.css";
+export default function KegiatanPage(){
+    const [kegiatans, setKegiatans] = useState([]);
+    const [organisasis, setOrganisasis] = useState([]);
+    const [formVisible, setFormVisible] = useState(false);
+    const [judulKegiatan, setJudulKegiatan] = useState('');
+    const [idOrganisasi, setIdOrganisasi] = useState('');
+    const [tanggalKegiatan, setTanggalKegiatan] = useState('');
+    const [lokasi, setLokasi] = useState('');
+    const [jenisKegiatan, setJenisKegiatan] = useState('');
+    const [deskripsiSingkat, setDeskripsiSingkat] = useState('');
+    const [editId, setEditId] = useState(null);
+    const [msg, setMsg] = useState('');
 
-export default function KegiatanPage() {
-  const [kegiatanList, setKegiatanList] = useState([]);
-  const [organisasiList, setOrganisasiList] = useState([]);
-  const [form, setForm] = useState({
-    judulKegiatan: "",
-    idOrganisasi: "",
-    tanggalKegiatan: "",
-    lokasi: "",
-    jenisKegiatan: "",
-    deskripsiSingkat: "",
-    tautanPendaftaran: "",
-  });
-  const [editId, setEditId] = useState(null);
+    const fetchKegiatans = async () => {
+        const res = await fetch('/api/kegiatan');
+        const data = await res.json();
+        setKegiatans(data);
+    };
+    const fetchOrganisasis = async () => {
+        const res = await fetch('/api/organisasi');
+        const data = await res.json();
+        setOrganisasis(data);
+    };
+    useEffect(() => {
+        fetchKegiatans();
+        fetchOrganisasis();
+    }, []);
 
-  const fetchKegiatan = async () => {
-    const res = await fetch("/api/kegiatan");
-    if (res.ok) {
-      const data = await res.json();
-      setKegiatanList(data);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!judulKegiatan || !idOrganisasi || !tanggalKegiatan || !lokasi || !jenisKegiatan || !deskripsiSingkat){
+            setMsg('Semua Filed Wajib Diisi');
+            return;
+        }
+
+        const formattedTanggal = new Date(tanggalKegiatan).toISOString();
+        if(isNaN(Date.parse(formattedTanggal))){
+            setMsg('Tahun tidak valid');
+            return;
+        }
+
+
+        const data = {
+            id: editId,
+            judulKegiatan,
+            idOrganisasi,
+            tanggalKegiatan : formattedTanggal,
+            lokasi,
+            jenisKegiatan,
+            deskripsiSingkat,
+        };
+
+        const method = editId? 'PUT' : 'POST';
+        const res = await fetch('/api/kegiatan', {
+            method,
+            headers: {'Content-Type': "application/json"},
+            body: JSON.stringify(data),
+        });
+
+        if(res.ok){
+            setMsg('Berhasil disimpan');
+            setJudulKegiatan('');
+            setIdOrganisasi('');
+            setTanggalKegiatan('');
+            setLokasi('');
+            setJenisKegiatan('');
+            setDeskripsiSingkat('');
+            setEditId(null);
+            setFormVisible(false);
+            fetchKegiatans();
+        }else{
+            setMsg('Gagal menyimpan data')
+        }
+    };
+    const handleEdit = (item) => {
+        setJudulKegiatan(item.judulKegiatan);
+        setIdOrganisasi(item.idOrganisasi);
+        setTanggalKegiatan(item.tanggalKegiatan.split('T')[0]);
+        setLokasi(item.lokasi);
+        setJenisKegiatan(item.jenisKegiatan);
+        setDeskripsiSingkat(item.deskripsiSingkat);
+        setEditId(item.id);
+        setFormVisible(true);
     }
-  };
 
-  const fetchOrganisasi = async () => {
-    const res = await fetch("/api/organisasi");
-    if (res.ok) {
-      const data = await res.json();
-      setOrganisasiList(data);
-    }
-  };
+    const handleDelete = async (id) => {
+        if(!confirm('Yakin ingin hapus data ini')) return;
 
-  useEffect(() => {
-    fetchKegiatan();
-    fetchOrganisasi();
-  }, []);
+        await fetch('/api/kegiatan', {
+            method: 'DELETE',
+            headers: {'Content-Type' : 'application/json'},
+            body: JSON.stringify({id}),
+        })
+        fetchKegiatans();
+    };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    return (
+        <div className={styles.container}>
+            <button
+                className={styles.buttonToggle}
+                onClick={() => setFormVisible(!formVisible)}>
+                {formVisible ? "Tutup Form" : "Tambah Data"}
+            </button>
+            <button>
+                <a className= {styles.buttonToggle} href="http://localhost:3000/organisasi">Menuju ke organisasi</a>
+            </button>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await fetch("/api/kegiatan", {
-      method: editId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editId ? { ...form, id: editId } : form),
-    });
-
-    if (res.ok) {
-      setForm({
-        judulKegiatan: "",
-        idOrganisasi: "",
-        tanggalKegiatan: "",
-        lokasi: "",
-        jenisKegiatan: "",
-        deskripsiSingkat: "",
-        tautanPendaftaran: "",
-      });
-      setEditId(null);
-      fetchKegiatan();
-    }
-  };
-
-  const handleEdit = (item) => {
-    setForm({
-      judulKegiatan: item.judulKegiatan,
-      idOrganisasi: item.idOrganisasi,
-      tanggalKegiatan: item.tanggalKegiatan.split("T")[0],
-      lokasi: item.lokasi,
-      jenisKegiatan: item.jenisKegiatan,
-      deskripsiSingkat: item.deskripsiSingkat,
-      tautanPendaftaran: item.tautanPendaftaran || "",
-    });
-    setEditId(item.id);
-  };
-
-  const handleDelete = async (id) => {
-    const res = await fetch(`/api/kegiatan?id=${id}`, { method: "DELETE" });
-    if (res.ok) fetchKegiatan();
-  };
-
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Manajemen Kegiatan</h1>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <input
-          type="text"
-          name="judulKegiatan"
-          placeholder="Judul Kegiatan"
-          value={form.judulKegiatan}
-          onChange={handleChange}
-          required
-        />
-
-        <select
-          name="idOrganisasi"
-          value={form.idOrganisasi}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Pilih Organisasi</option>
-          {organisasiList.map((org) => (
-            <option key={org.id} value={org.id}>
-              {org.namaOrganisasi}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="date"
-          name="tanggalKegiatan"
-          value={form.tanggalKegiatan}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          type="text"
-          name="lokasi"
-          placeholder="Lokasi"
-          value={form.lokasi}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          type="text"
-          name="jenisKegiatan"
-          placeholder="Jenis Kegiatan"
-          value={form.jenisKegiatan}
-          onChange={handleChange}
-          required
-        />
-
-        <textarea
-          name="deskripsiSingkat"
-          placeholder="Deskripsi Singkat"
-          value={form.deskripsiSingkat}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          type="url"
-          name="tautanPendaftaran"
-          placeholder="Tautan Pendaftaran (opsional)"
-          value={form.tautanPendaftaran}
-          onChange={handleChange}
-        />
-
-        <button type="submit">
-          {editId ? "Simpan Perubahan" : "Tambah Kegiatan"}
-        </button>
-      </form>
-
-      <div className={styles.tableContainer}>
-        <table>
-          <thead>
-            <tr>
-              <th>Judul</th>
-              <th>Organisasi</th>
-              <th>Tanggal</th>
-              <th>Lokasi</th>
-              <th>Jenis</th>
-              <th>Deskripsi</th>
-              <th>Tautan</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {kegiatanList.map((item) => (
-              <tr key={item.id}>
-                <td>{item.judulKegiatan}</td>
-                <td>
-                  {
-                    organisasiList.find((org) => org.id === item.idOrganisasi)?.namaOrganisasi ||
-                    "-"
-                  }
-                </td>
-                <td>{new Date(item.tanggalKegiatan).toLocaleDateString()}</td>
-                <td>{item.lokasi}</td>
-                <td>{item.jenisKegiatan}</td>
-                <td>{item.deskripsiSingkat}</td>
-                <td>
-                  {item.tautanPendaftaran ? (
-                    <a href={item.tautanPendaftaran} target="_blank">Link</a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(item)}>Edit</button>
-                  <button onClick={() => handleDelete(item.id)}>Hapus</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+            {formVisible && (
+                <div className={styles.formWrapper}>
+                    <h3>Input Data Baru</h3>
+                    <form onSubmit={handleSubmit}>
+                        <div className={styles.formGroup}>
+                            <span>Nama Kegiatan</span>
+                            <input
+                            type= "text"
+                            value={judulKegiatan}
+                            onChange={(e) => setJudulKegiatan(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <span>Nama Organisasi</span>
+                            <select
+                            value={idOrganisasi}
+                            onChange={(e) => setIdOrganisasi(e.target.value)}
+                            required
+                            >
+                                <option value="">Pilih Organisasi</option>
+                                {organisasis.map((organisasi) => (
+                                    <option key={organisasi.id} value={organisasi.id}>
+                                        {organisasi.namaOrganisasi}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <span>Tanggal Kegiatan</span>
+                            <input
+                            type= "date"
+                            value={tanggalKegiatan}
+                            onChange={(e) => setTanggalKegiatan(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <span>Lokasi</span>
+                            <input
+                            type= "text"
+                            value={lokasi}
+                            onChange={(e) => setLokasi(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <span>Jenis Kegiatan</span>
+                            <input
+                            type= "text"
+                            value={jenisKegiatan}
+                            onChange={(e) => setJenisKegiatan(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <span>Deskripsi Singkat</span>
+                            <input
+                            type= "text"
+                            value={deskripsiSingkat}
+                            onChange={(e) => setDeskripsiSingkat(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <button className={styles.submitButton} type="submit">
+                            Simpan
+                        </button>
+                        <p>{msg}</p>
+                    </form>
+                </div>
+            )}
+        <div className={styles.tableWrapper}>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Kegiatan</th>
+                        <th>Nama Organisasi</th>
+                        <th>Tanggal Kegiatan</th>
+                        <th>Lokasi</th>
+                        <th>Jenis Kegiatan</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {kegiatans.map((item, index) => (
+                        <tr key={item.id}>
+                            <td>{index + 1}</td>
+                            <td>{item.judulKegiatan}</td>
+                            <td>{item.organisasi?.namaOrganisasi || "Unknown"}</td>
+                            <td>{new Date(item.tanggalKegiatan).toISOString().split('T')[0]}</td>
+                            <td>{item.lokasi}</td>
+                            <td>{item.jenisKegiatan}</td>
+                            <td>{item.deskripsiSingkat}</td>
+                            <td>
+                            <button className={styles.editButton} onClick={() => handleEdit(item)}>Edit</button>
+                            <button className={styles.deleteButton} onClick={() => handleDelete(item.id)}>Hapus</button>
+                            </td>
+                        </tr>
+                    ))}
+                    {kegiatans.length === 0 && (
+                        <tr>
+                            <td colSpan="8">Belum ada data</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    )
 }

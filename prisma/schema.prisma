@@ -17,8 +17,8 @@ model organisasi {
   ketuaOrganisasi String
   noKontak        String
   tahunDibentuk   DateTime
-  pembina         String?
-  kegiatan        Kegiatan[]  
+  pembina         String
+  kegiatan        kegiatan[]  
 }
 
 model kegiatan {
@@ -29,6 +29,6 @@ model kegiatan {
   lokasi             String
   jenisKegiatan      String      
   deskripsiSingkat   String
-  tautanPendaftaran  String?     
+  tautanPendaftaran  String     
   organisasi         organisasi  @relation(fields: [idOrganisasi], references: [id])
 }
